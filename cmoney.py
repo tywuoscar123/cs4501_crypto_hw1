@@ -8,14 +8,16 @@ from xml.sax.handler import feature_external_ges
 import rsa
 import os
 
+#python3 cmoney.py
 #define name of currency
 currencyName = "FreeCoinz"
 
 #generate genesis block with phrase
-def genesis(fileName):
+def genesis():
     quote = "Revolution of our times."
-    f = open(fileName, "w")
+    f = open("block_0.txt", "w")
     f.write(quote)
+    print("Genesis block created in 'block_0.txt'")
     return
 
 #generate wallet with keys in text
@@ -23,7 +25,7 @@ def generate(fileName):
     (pubkey, privkey) = rsa.newkeys(1024)
     saveWallet(pubkey, privkey, fileName)
     signature = getWalletAddr(fileName)
-    print("New wallet generated in " + fileName + " with signature " + signature)
+    print("New wallet generated in '" + fileName + "' with signature " + signature)
     return
 
 def address(fileName):
@@ -54,37 +56,6 @@ def transfer(srcFileName, destAddr, amount, fileName):
     print("Transferred " + amount + " from " + srcFileName + " to " + destAddr + " and the statement to " + fileName + " on " + str(datetime.now()) )
     return
 
-#get balance , needed for verifiy() and balance()
-def getBalance(walletAddr):
-    balance = 0
-    currentPath = os.path.abspath(os.getcwd())
-    #iterate through current dir to find ledger and block 
-    for file in os.listdir(currentPath):
-        if "ledger.txt" in file:
-            ledger = open(file)
-            records = ledger.readlines()
-            for line in records:
-                content = line.split(" ")
-                #a3e47443b0f3bc76 transferred 12.5 to 48adadf4fb921fca on Tue Apr 02 23:09:14 EDT 2019
-                #wallet transferred funds to another wallet, - balance (need to check transfer to self?)
-                if content[0] == walletAddr and content[4] != walletAddr:
-                    balance -= float(content[2])   
-                #received money, + balance
-                elif content[4] == walletAddr and content[0] != walletAddr:
-                    balance += float(content[2])
-        elif (file.find("block_") != -1 and file.find("block_0") == -1):
-            block = open(file)
-            records = block.readlines()[2:-1]
-            for line in records:
-                content = line.split(" ")
-                #wallet transferred funds to another wallet, - balance (need to check transfer to self?)
-                if content[0] == walletAddr and content[4] != walletAddr:
-                    balance -= float(content[2])   
-                #received money, + balance
-                elif content[4] == walletAddr and content[0] != walletAddr:
-                    balance += float(content[2])
-    print(str(balance))
-    return balance
 #print out balance obtained from getBalance()
 def balance(walletAddr):
     print(str(getBalance(walletAddr)))
@@ -114,7 +85,7 @@ def verify(srcFileName, transFileName):
         record = "".join(content[0:4])
         amountFloat = float(content[2].split(" ")[1][:-1])
         senderAddr = str(content[0].split(" ")[1][:-1])
-        if(rsa.verify(record.encode(),hash, pubKey) == "SHA-256" and balance(senderAddr) > amountFloat):
+        if(rsa.verify(record.encode(),hash, pubKey) == "SHA-256" and getBalance(senderAddr) > amountFloat):
             with open("ledger.txt", "a+") as ledger:
                 #a3e47443b0f3bc76 transferred 12.5 to 48adadf4fb921fca on 2022-02-07 02:38:31.012025 
                 #extract data from ledger and write to file     
@@ -132,6 +103,13 @@ def verify(srcFileName, transFileName):
 
 def mine(difficulty):
     currentPath = os.path.abspath(os.getcwd())
+    blocks = []
+    #get all name of the blocks in an array first
+    for fileName in os.listdir(currentPath):
+        if("block_" in fileName):
+            blocks.append(fileName)
+    print(blocks)
+    print(len(blocks))
     return
 
 #helper functions
@@ -191,6 +169,37 @@ def saveWallet(pubkey, privkey, filename):
 def getTransSign(privKey, input):
     signature = rsa.sign(input.encode(), privKey, "SHA-256")
     return signature
+
+#get balance , needed for verifiy() and balance()
+def getBalance(walletAddr):
+    balance = 0
+    currentPath = os.path.abspath(os.getcwd())
+    #iterate through current dir to find ledger and block 
+    for file in os.listdir(currentPath):
+        if "ledger.txt" in file:
+            ledger = open(file)
+            records = ledger.readlines()
+            for line in records:
+                content = line.split(" ")
+                #a3e47443b0f3bc76 transferred 12.5 to 48adadf4fb921fca on Tue Apr 02 23:09:14 EDT 2019
+                #wallet transferred funds to another wallet, - balance (need to check transfer to self?)
+                if content[0] == walletAddr and content[4] != walletAddr:
+                    balance -= float(content[2])   
+                #received money, + balance
+                elif content[4] == walletAddr and content[0] != walletAddr:
+                    balance += float(content[2])
+        elif (file.find("block_") != -1 and file.find("block_0") == -1):
+            block = open(file)
+            records = block.readlines()[2:-1]
+            for line in records:
+                content = line.split(" ")
+                #wallet transferred funds to another wallet, - balance (need to check transfer to self?)
+                if content[0] == walletAddr and content[4] != walletAddr:
+                    balance -= float(content[2])   
+                #received money, + balance
+                elif content[4] == walletAddr and content[0] != walletAddr:
+                    balance += float(content[2])
+    return float(balance)
 
 if __name__ == "__main__":
     args = sys.argv
