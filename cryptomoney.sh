@@ -4,7 +4,7 @@
 
 case "$1" in
 
-    name) echo "AaronDollar(TM)"
+    name) python3 cmoney.py name 
 	  # additional parameters provided: (none)
 	  ;;
 

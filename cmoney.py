@@ -12,6 +12,11 @@ import os
 #define name of currency
 currencyName = "FreeCoinz"
 
+#print name of currency
+def name():
+    print(currencyName)
+    return
+
 #generate genesis block with phrase
 def genesis():
     quote = "Revolution of our times."

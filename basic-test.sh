@@ -30,8 +30,8 @@ cat ledger.txt
 echo checking the balance of both alice and bob
 ./cryptomoney.sh balance $alice
 ./cryptomoney.sh balance $bob
-echo mining the block with prefix of 2 (NOT DONE)
+echo mining the block with prefix of 2 INCOMPLETE
 #./cryptomoney.sh mine 2
 #sha256sum block_1.txt
-echo validating the cryptocurrency chain (NOT DONE)
+echo validating the cryptocurrency chain INCOMPLETE
 #./cryptomoney.sh validate
