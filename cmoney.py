@@ -294,7 +294,7 @@ def getBalance(walletAddr):
                     balance += float(content[2])
         elif (file.find("block_") != -1 and file.find("block_0") == -1):
             block = open(file)
-            records = block.readlines()[2:-1]
+            records = block.readlines()[2:-2]
             for line in records:
                 content = line.split(" ")
                 #wallet transferred funds to another wallet, - balance (need to check transfer to self?)
