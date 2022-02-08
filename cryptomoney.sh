@@ -40,13 +40,13 @@ case "$1" in
 	    # transaction file name
 	    ;;
 
-   # mine) python3 cmoney.py mine $2
+    mine) python3 cmoney.py mine $2
 		 # additional parameters provided: difficulty
-	#	 ;;
+		 ;;
     
-    validate) python3 cmoney.py validate
+    #validate) python3 cmoney.py validate
 	      # additional parameters provided: (none)
-	      ;;
+	 #     ;;
 
    # *) echo Unknown function: $1
     #   ;;

@@ -58,7 +58,7 @@ def transfer(srcFileName, destAddr, amount, fileName):
     transSign = str(binascii.hexlify(getTransSign(loadWallet(srcFileName)[1], transactionInfo)).decode("utf-8"))
     f.writelines([transactionInfo, "\n", transSign])
     #Transferred 12.5 from alice.wallet.txt to d96b71971fbeec39 and the statement to '03-alice-to-bob.txt' on Tue Apr 02 23:09:00 EDT 2019
-    print("Transferred " + amount + " from " + srcFileName + " to " + destAddr + " and the statement to " + fileName + " on " + str(datetime.now()) )
+    print("Transferred " + amount + " from '" + srcFileName + "' to " + destAddr + " and the statement to '" + fileName + "' on " + str(datetime.now()) )
     return
 
 #print out balance obtained from getBalance()
@@ -113,8 +113,30 @@ def mine(difficulty):
     for fileName in os.listdir(currentPath):
         if("block_" in fileName):
             blocks.append(fileName)
-    print(blocks)
-    print(len(blocks))
+    previousHash = hashFile("block_" + str(len(blocks) - 1) + ".txt")
+    with open("ledger.txt", "r+") as ledgerFile, open("block_" + str(len(blocks)) + ".txt", "w+") as newBlock:
+        newBlock.write(previousHash + "\n\n")
+        for line in ledgerFile:
+            newBlock.write(line)
+        newBlock.seek(0,0)
+        blockContent = newBlock.readlines()
+        blockContent = "".join(blockContent).encode("utf-8")
+        newBlockHash = hashlib.sha256(blockContent).hexdigest()
+        nonce = 0
+        mineSuccess = False
+        #use while loop to find nonce
+        while(mineSuccess != True):
+            newSrc = newBlockHash + str(nonce)
+            nonceHash =  hashlib.sha256(newSrc.encode("utf-8")).hexdigest()
+            nonceHash = list(nonceHash)
+            mineSuccess = all(num == "0" for num in nonceHash[:int(difficulty)])
+            nonce += 1
+        newBlock.seek(0,2)
+        newBlock.write("\nNonce:" + str(nonce))
+        #clear ledger
+        ledgerFile.truncate(0)
+    #Ledger transactions moved to block_1.txt and mined with difficulty 2 and nonce 1029
+    print("Ledger transactions moved to block_" + str(len(blocks)) + ".txt and mined with difficulty " + difficulty + " and nonce " + str(nonce))
     return
 
 #helper functions
