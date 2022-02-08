@@ -33,5 +33,5 @@ echo checking the balance of both alice and bob
 echo mining the block with prefix of 2
 ./cryptomoney.sh mine 2
 #sha256sum block_1.txt
-echo validating the cryptocurrency chain INCOMPLETE
-#./cryptomoney.sh validate
+echo validating the cryptocurrency chain
+./cryptomoney.sh validate

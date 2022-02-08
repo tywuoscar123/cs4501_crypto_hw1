@@ -44,9 +44,9 @@ case "$1" in
 		 # additional parameters provided: difficulty
 		 ;;
     
-    #validate) python3 cmoney.py validate
+    validate) python3 cmoney.py validate
 	      # additional parameters provided: (none)
-	 #     ;;
+	      ;;
 
    # *) echo Unknown function: $1
     #   ;;
